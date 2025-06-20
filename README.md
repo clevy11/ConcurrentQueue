@@ -11,10 +11,10 @@ ConcurQueue is a high-performance, concurrent job processing system designed to 
 - **Graceful Shutdown**: Proper cleanup of resources on shutdown
 - **Thread Safety**: Thread-safe implementation using Java's concurrent utilities
 
-```markdown
+
 ## System Architecture
 
-![img.png](img.png)
+![img_1.png](img_1.png)
 
 ## Requirements
 
