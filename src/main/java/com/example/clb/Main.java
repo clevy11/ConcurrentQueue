@@ -22,13 +22,15 @@ public class Main {
         // Create task dispatcher with worker pool
         TaskDispatcher dispatcher = new TaskDispatcher(NUM_WORKERS, QUEUE_CAPACITY, MAX_RETRIES);
         
-        // Create producers
+        // Create producers with different strategies
         List<TaskProducer> producers = new ArrayList<>();
         ExecutorService producerPool = Executors.newFixedThreadPool(NUM_PRODUCERS);
         
-        for (int i = 0; i < NUM_PRODUCERS; i++) {
-            TaskProducer producer = new TaskProducer(dispatcher, TASKS_PER_PRODUCER, "Producer-" + (i + 1));
-            producers.add(producer);
+        producers.add(new TaskProducer(dispatcher, TASKS_PER_PRODUCER, "High-Priority-Producer", TaskProducer.PriorityStrategy.HIGH));
+        producers.add(new TaskProducer(dispatcher, TASKS_PER_PRODUCER, "Low-Priority-Producer", TaskProducer.PriorityStrategy.LOW));
+        producers.add(new TaskProducer(dispatcher, TASKS_PER_PRODUCER, "Mixed-Priority-Producer", TaskProducer.PriorityStrategy.MIXED));
+
+        for (TaskProducer producer : producers) {
             producerPool.submit(producer);
         }
         

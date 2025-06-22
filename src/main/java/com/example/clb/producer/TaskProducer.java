@@ -10,15 +10,21 @@ public class TaskProducer implements Runnable {
     private static final String[] TASK_TYPES = {"DataProcessing", "ReportGeneration", "ImageProcessing", "DataBackup", "EmailSending"};
     private static final Random random = new Random();
     
+    public enum PriorityStrategy {
+        HIGH, LOW, MIXED
+    }
+    
     private final TaskDispatcher dispatcher;
     private final int taskCount;
     private final String producerId;
+    private final PriorityStrategy strategy;
     private volatile boolean isRunning = true;
 
-    public TaskProducer(TaskDispatcher dispatcher, int taskCount, String producerId) {
+    public TaskProducer(TaskDispatcher dispatcher, int taskCount, String producerId, PriorityStrategy strategy) {
         this.dispatcher = dispatcher;
         this.taskCount = taskCount;
         this.producerId = producerId;
+        this.strategy = strategy;
     }
 
     @Override
@@ -27,8 +33,8 @@ public class TaskProducer implements Runnable {
         
         for (int i = 0; i < taskCount && isRunning; i++) {
             try {
-                // Randomly decide task priority (1-10, higher is more important)
-                int priority = random.nextInt(10) + 1;
+                // Randomly decide task priority based on strategy
+                int priority = getTaskPriority();
                 String taskType = TASK_TYPES[random.nextInt(TASK_TYPES.length)];
                 String payload = String.format("Task-%s-%d", taskType, i);
                 
@@ -48,6 +54,14 @@ public class TaskProducer implements Runnable {
         }
         
         System.out.println(Thread.currentThread().getName() + " finished producing tasks");
+    }
+
+    private int getTaskPriority() {
+        return switch (strategy) {
+            case HIGH -> 8 + random.nextInt(3);  // Priority 8, 9, 10
+            case LOW  -> 1 + random.nextInt(3);   // Priority 1, 2, 3
+            case MIXED-> 1 + random.nextInt(10); // Priority 1-10
+        };
     }
 
     public void stop() {
